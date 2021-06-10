@@ -1,6 +1,6 @@
 # import tensorflow as tf
 #NN_MODEL = "./submit/results/nn_model_ep_18200.ckpt" # model path settings, if using ML-based method
-
+import random
 class Algorithm:
      def __init__(self):
      # fill your self params
@@ -13,7 +13,7 @@ class Algorithm:
 
      # Define your algo
      def run(self, time, S_time_interval, S_send_data_size, S_chunk_len, S_rebuf, S_buffer_size, S_play_time_len,S_end_delay, S_decision_flag, S_buffer_flag,S_cdn_flag,S_skip_time, end_of_video, cdn_newest_id,download_id,cdn_has_frame,IntialVars):
-
+          
          # If you choose the marchine learning
          '''state = []
 
@@ -43,7 +43,9 @@ class Algorithm:
          target_buffer = 0
          latency_limit = 4
 
-
+         bit_rate = 3
+         target_buffer = 0
+         latency_limit = 500
 
          return bit_rate, target_buffer, latency_limit
 
@@ -56,3 +58,20 @@ class Algorithm:
      # get your params
         your_params = []
         return your_params
+
+     def train(self):
+         #preprocess
+         raw_data = []
+         #get label
+         label = []
+         #pick 100000 frame
+         pick_frame_id = random.choice(range(100000))
+         train_data = []
+         for i in range(100000):
+            train_data.append(raw_data[pick_frame_id[i]]-raw_data[pick_frame_id[i]-1])
+         
+         #train
+         bitrate = range(3)
+         target_buffer = [0,1]
+         
+

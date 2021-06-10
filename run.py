@@ -101,8 +101,11 @@ def test(testcase):
     S_skip_time = [0] * past_frame_num
     # params setting
     call_time_sum = 0 
+    reward_frame_log = []
+    feature = []
+    loop_cnt = 0
     while True:
-
+        loop_cnt+=1
         reward_frame = 0
         # input the train steps
         #if cnt > 5000:
@@ -152,6 +155,18 @@ def test(testcase):
         S_cdn_flag.append(cdn_flag) 
         S_skip_time.append(skip_frame_time_len)
 
+        feature.append([time_interval,
+                    send_data_size,
+                    chunk_len,
+                    rebuf,
+                    buffer_size, 
+                    play_time_len,
+                    end_delay,
+                    decision_flag, 
+                    buffer_flag,
+                    cdn_flag,
+                    skip_frame_time_len])
+
         # QOE setting 
         if end_delay <=1.0:
             LANTENCY_PENALTY = 0.005
@@ -167,7 +182,8 @@ def test(testcase):
             reward_frame += -1 * SMOOTH_PENALTY * (abs(BIT_RATE[bit_rate] - BIT_RATE[last_bit_rate]) / 1000)
             # last_bit_rate
             last_bit_rate = bit_rate
-
+            
+            
             # ----------------- Your Algorithm ---------------------
             # which part is the algorithm part ,the buffer based , 
             # if the buffer is enough ,choose the high quality
@@ -225,9 +241,19 @@ def test(testcase):
             S_decision_flag = [0] * past_frame_num
             S_buffer_flag = [0] * past_frame_num
             S_cdn_flag = [0] * past_frame_num
-            
+        # record reward of each frame
+        reward_frame_log.append(reward_frame)    
         reward_all += reward_frame
     print(f"{VIDEO_TRACE},{NETWORK_TRACE}: Done")
+    
+    # for i in range(len(reward_frame_log)):
+    #     print(reward_frame_log[i])
+    # print("reward frame count:"+str(len(reward_frame_log)))
+    # print("feature count:"+str(len(feature)))
+    # print("first feature length:"+str(len(feature)))
+    # print("loop cnt:"+str(loop_cnt))
+    np.save(VIDEO_TRACE+'_'+NETWORK_TRACE+'_raw_data',feature)
+    np.save(VIDEO_TRACE+'_'+NETWORK_TRACE+'_reward_frame',reward_frame_log)
     return [reward_all_sum / trace_count, run_time / trace_count]
 
 if __name__ == "__main__":
